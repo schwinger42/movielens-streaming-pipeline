@@ -5,7 +5,7 @@
 This project creates an end-to-end data pipeline for the MovieLens 20M dataset, processing movie ratings data to generate insights about movie popularity and viewer preferences. The goal is to demonstrate a complete data engineering workflow that:
 
 1. Ingests movie ratings data from the MovieLens dataset
-2. Processes this data through a medallion architecture (Bronze/Silver/Gold layers)
+2. Processes this data through a medallion architecture
 3. Transforms the data for analytics
 4. Presents insights through interactive dashboards
 
@@ -13,103 +13,55 @@ The solution enables movie recommendation platforms to understand viewing patter
 
 
 ## Architecture
+![archi](./archi.svg)
+### Key Lakehouse Architecture Principles Implemented
 
-```mermaid
-flowchart LR
-    classDef ingestion fill:#FF9900,stroke:#FF8000,color:#333,stroke-width:1px
-    classDef processing fill:#2372BD,stroke:#1A5C9E,color:white,stroke-width:1px
-    classDef storage fill:#24A443,stroke:#198038,color:white,stroke-width:1px
-    classDef transform fill:#E94537,stroke:#CB3A2E,color:white,stroke-width:1px
-    classDef viz fill:#3B83BD,stroke:#2E6CA1,color:white,stroke-width:1px
-    classDef orchestration fill:#9D47B8,stroke:#853D9D,color:white,stroke-width:1px
-    classDef infra fill:#232F3E,stroke:#131921,color:white,stroke-width:1px
-    
-    subgraph AWS["AWS Cloud"]
-        direction LR
-        
-        subgraph Infra["EC2 Instance (t3.medium)"]
-            direction LR
-            
-            subgraph Ingest["Data Ingestion"]
-                direction TB
-                Kafka["Apache Kafka (KRaft)"]
-                Producer["Data Producer"]
-                Consumer["Data Consumer"]
-                
-                Producer --> Kafka
-                Kafka --> Consumer
-            end
-            
-            subgraph Process["Data Processing"]
-                direction TB
-                Spark["PySpark/DLTHub"]
-                Medallion["Medallion Architecture"]
-                Bronze["Bronze Layer"]
-                Silver["Silver Layer"]
-                Gold["Gold Layer"]
-                
-                Medallion --> Bronze
-                Bronze --> Silver
-                Silver --> Gold
-            end
-            
-            subgraph Store["Data Storage"]
-                direction TB
-                S3Iceberg["S3 + Iceberg"]
-                Parquet["Parquet Files"]
-                
-                S3Iceberg --> Parquet
-            end
-            
-            subgraph Transform["Transformations"]
-                direction TB
-                dbt["dbt-core + PySpark"]
-                Models["Data Models"]
-                
-                dbt --> Models
-            end
-            
-            subgraph Viz["Visualization"]
-                direction TB
-                Metabase["Metabase"]
-                Dashboard["Interactive Dashboards"]
-                
-                Metabase --> Dashboard
-            end
-            
-            subgraph Orch["Orchestration"]
-                direction TB
-                Kestra["Kestra Workflow Engine"]
-                Workflow["End-to-End Pipeline"]
-                
-                Kestra --> Workflow
-            end
-            
-            Ingest --> Process
-            Process --> Store
-            Store --> Transform
-            Transform --> Viz
-            
-            Orch -.-> Ingest
-            Orch -.-> Process
-            Orch -.-> Store
-            Orch -.-> Transform
-        end
-        
-        S3Bucket["S3 Bucket: movielens-dev-datalake"]
-        Store -.-> S3Bucket
-    end
-    
-    ML["MovieLens 20M Dataset"] --> Ingest
-    
-    class Ingest,Kafka,Producer,Consumer ingestion
-    class Process,Spark,Medallion,Bronze,Silver,Gold processing
-    class Store,S3Iceberg,Parquet storage
-    class Transform,dbt,Models transform
-    class Viz,Metabase,Dashboard viz
-    class Orch,Kestra,Workflow orchestration
-    class AWS,Infra,S3Bucket infra
-```
+1. Separation of Storage and Compute
+   * Storage layer: S3 bucket (`movielens-dev-datalake`) provisioned by Terraform
+   * Compute layer: EC2 instance running processing engines (PySpark, dbt)
+   * This separation allows for independent scaling of storage and processing power
+
+
+2. Medallion Architecture on Object Storage
+   * Bronze layer: Raw data stored as Parquet files in S3
+   * Silver layer: Cleaned and standardized data
+   * Gold layer: Business-ready analytical data
+   * Unlike a traditional data warehouse, all these layers exist directly in the data lake
+
+
+3. Schema Evolution with Iceberg
+   * setup_iceberg.py provides table management capabilities
+   * Enables schema evolution, time travel, and ACID transactions on the data lake
+   * This is a key differentiator from traditional data warehouses
+
+
+4. SQL Analytics on the Lakehouse
+   * dbt models query directly against the Lakehouse
+   * No need to export data to a separate warehouse
+   * `silver_movie_ratings.sql` and `gold_movie_analytics.sql` can run directly against the lake
+
+
+5. Multiple Compute Engines on Same Storage
+   * Stream processing with Kafka/PySpark
+   * Batch processing with local_medallion.py
+   * SQL analytics with dbt
+   * All working against the same underlying storage layer
+
+### Infrastructure as Code Integration
+The diagrams highlight how your Terraform code (`main.tf`, `variables.tf`, `outputs.tf`) provisions:
+
+1. The S3 bucket that serves as the foundation of your Lakehouse
+2. The EC2 instance that hosts the compute engines
+3. Security groups that control access to the various services
+
+Advantages Over Traditional Data Warehouses
+Your Lakehouse implementation offers several advantages:
+
+1. **Cost Efficiency**: You only pay for the storage you use in S3, rather than provisioning an entire data warehouse
+2. **Flexibility**: Different processing engines can work on the same data
+3. **Scalability**: Storage can scale independently from compute resources
+
+This architecture demonstrates a modern approach to data engineering that achieves the performance and reliability of a data warehouse with the flexibility and cost-effectiveness of a data lake.
 
 
 The pipeline follows a medallion architecture pattern:
