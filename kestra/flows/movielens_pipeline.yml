@@ -1,0 +1,58 @@
+id: movielens_pipeline
+namespace: movielens
+
+tasks:
+  - id: download_dataset
+    type: io.kestra.plugin.scripts.python.Script
+    script: |
+      import sys
+      import os
+      
+      # Add the project directory to the path
+      sys.path.append("/app")
+      
+      # Import the download script
+      from datasets.download_movielens import download_and_extract_movielens, upload_to_s3
+      
+      # Execute the download and upload
+      dataset_path = download_and_extract_movielens()
+      upload_to_s3(dataset_path)
+      
+      print("Dataset downloaded and uploaded to S3 successfully")
+    
+  - id: start_kafka_producer
+    type: io.kestra.plugin.scripts.python.Script
+    dependsOn:
+      - download_dataset
+    script: |
+      import sys
+      import os
+      
+      # Add the project directory to the path
+      sys.path.append("/app")
+      
+      # Import the Kafka producer
+      from kafka.movie_producer import create_kafka_producer, stream_movies, stream_ratings
+      
+      # Create Kafka producer
+      producer = create_kafka_producer()
+      
+      # Stream data
+      dataset_path = 'raw/ml-20m'
+      stream_movies(producer, dataset_path)
+      stream_ratings(producer, dataset_path)
+      
+      print("Data streaming to Kafka completed")
+    
+  - id: run_dbt_models
+    type: io.kestra.plugin.scripts.shell.Shell
+    dependsOn:
+      - start_kafka_producer
+    commands:
+      - cd /app/dbt_project && dbt run
+    
+  - id: notification
+    type: io.kestra.core.tasks.log.Log
+    dependsOn:
+      - run_dbt_models
+    message: "MovieLens pipeline completed successfully"

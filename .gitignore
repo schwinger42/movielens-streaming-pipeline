@@ -1,0 +1,19 @@
+# Sensitive/large files
+raw/ml-20m/*
+output/*
+jars/*.jar
+
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
