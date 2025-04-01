@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#f8f9fa" />
+
+  <!-- Title -->
+  <text x="500" y="30" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">MovieLens 20M Lakehouse Architecture</text>
+
+  <!-- AWS Cloud Border -->
+  <rect x="50" y="60" width="900" height="620" rx="10" ry="10" fill="none" stroke="#232F3E" stroke-width="2" stroke-dasharray="5,5" />
+  <text x="90" y="85" font-family="Arial" font-size="18" fill="#232F3E">AWS Cloud</text>
+
+  <!-- Terraform Provisioned Resources -->
+  <rect x="55" y="95" width="150" height="30" rx="5" ry="5" fill="#E9F0F6" stroke="#232F3E" stroke-width="1" />
+  <text x="130" y="115" font-family="Arial" font-size="12" text-anchor="middle">Terraform Managed</text>
+
+  <!-- EC2 Instance Border -->
+  <rect x="80" y="130" width="840" height="495" rx="10" ry="10" fill="#FFFFFF" stroke="#666666" stroke-width="2" />
+  <text x="100" y="155" font-family="Arial" font-size="16" fill="#232F3E">EC2 Instance (t3.medium)</text>
+
+  <!-- Storage vs. Compute Separation -->
+  <rect x="100" y="165" width="800" height="40" rx="5" ry="5" fill="#EBF5FB" stroke="#3498DB" stroke-width="1" />
+  <text x="500" y="190" font-family="Arial" font-size="14" text-anchor="middle" fill="#2E86C1">Lakehouse Architecture: Separation of Storage and Compute</text>
+
+  <!-- Stream Processing Layer -->
+  <rect x="100" y="220" width="220" height="150" rx="5" ry="5" fill="#FBD7BD" fill-opacity="0.8" stroke="#D86613" stroke-width="2" />
+  <text x="210" y="240" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold" fill="#8C3500">Stream Processing</text>
+
+  <!-- Download Component -->
+  <rect x="110" y="255" width="200" height="35" rx="5" ry="5" fill="#FFFFFF" stroke="#D86613" stroke-width="1" />
+  <text x="210" y="278" font-family="Arial" font-size="12" text-anchor="middle">download_movielens.py</text>
+
+  <!-- Kafka -->
+  <rect x="110" y="295" width="95" height="65" rx="5" ry="5" fill="#FFFFFF" stroke="#D86613" stroke-width="1" />
+  <text x="157" y="320" font-family="Arial" font-size="12" text-anchor="middle">Kafka</text>
+  <text x="157" y="338" font-family="Arial" font-size="10" text-anchor="middle">(Event Streaming)</text>
+
+  <!-- Producer -->
+  <rect x="215" y="295" width="95" height="65" rx="5" ry="5" fill="#FFFFFF" stroke="#D86613" stroke-width="1" />
+  <text x="262" y="320" font-family="Arial" font-size="12" text-anchor="middle">movie_producer.py</text>
+  <text x="262" y="338" font-family="Arial" font-size="10" text-anchor="middle">(Data Producer)</text>
+
+  <!-- Lakehouse Layer -->
+  <rect x="350" y="220" width="470" height="298" rx="5" ry="5" fill="#E8F8F5" fill-opacity="0.8" stroke="#1ABC9C" stroke-width="2" />
+  <text x="585" y="240" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold" fill="#117A65">S3 Lakehouse (Iceberg + Parquet)</text>
+
+  <!-- Medallion Architecture -->
+  <rect x="360" y="255" width="200" height="35" rx="5" ry="5" fill="#FFFFFF" stroke="#1ABC9C" stroke-width="1" />
+  <text x="460" y="278" font-family="Arial" font-size="12" text-anchor="middle">local_medallion.py</text>
+
+  <!-- Bronze Layer -->
+  <rect x="360" y="295" width="450" height="65" rx="5" ry="5" fill="#F7DC6F" stroke="#7D6608" stroke-width="1" fill-opacity="0.4" />
+  <text x="370" y="315" font-family="Arial" font-size="12" fill="#7D6608" font-weight="bold">Bronze Layer</text>
+  <text x="370" y="335" font-family="Arial" font-size="10" fill="#7D6608">Raw data, minimal cleaning</text>
+  <text x="370" y="350" font-family="Arial" font-size="10" fill="#7D6608">/bronze/movies.parquet, /bronze/ratings.parquet, /bronze/tags.parquet</text>
+
+  <!-- Silver Layer -->
+  <rect x="360" y="365" width="450" height="65" rx="5" ry="5" fill="#D7DBDD" stroke="#5D6D7E" stroke-width="1" fill-opacity="0.6" />
+  <text x="370" y="385" font-family="Arial" font-size="12" fill="#5D6D7E" font-weight="bold">Silver Layer</text>
+  <text x="370" y="405" font-family="Arial" font-size="10" fill="#5D6D7E">Cleaned data, standardized schema, joined dimensions</text>
+  <text x="370" y="420" font-family="Arial" font-size="10" fill="#5D6D7E">/silver/movies.parquet, /silver/ratings.parquet with dates, parsed genres</text>
+
+  <!-- Gold Layer -->
+  <rect x="360" y="435" width="450" height="80" rx="5" ry="5" fill="#F5CBA7" stroke="#A04000" stroke-width="1" fill-opacity="0.6" />
+  <text x="370" y="455" font-family="Arial" font-size="12" fill="#A04000" font-weight="bold">Gold Layer</text>
+  <text x="370" y="475" font-family="Arial" font-size="10" fill="#A04000">Analytics-ready, business metrics, aggregations</text>
+  <text x="370" y="490" font-family="Arial" font-size="10" fill="#A04000">/gold/movie_analytics.parquet (with avg_rating, num_ratings, rating_tier)</text>
+  <text x="370" y="505" font-family="Arial" font-size="10" fill="#A04000">/gold/movie_genres.parquet, /gold/genre_stats.parquet</text>
+
+  <!-- Compute & Transformation Layer -->
+  <rect x="570" y="255" width="240" height="35" rx="5" ry="5" fill="#FFFFFF" stroke="#1ABC9C" stroke-width="1" />
+  <text x="690" y="278" font-family="Arial" font-size="12" text-anchor="middle">setup_iceberg.py + s3_upload.py</text>
+
+  <!-- Orchestration Layer -->
+  <rect x="100" y="380" width="220" height="90" rx="5" ry="5" fill="#E8DAEF" fill-opacity="0.8" stroke="#8E44AD" stroke-width="2" />
+  <text x="210" y="400" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold" fill="#4A235A">Orchestration</text>
+
+  <!-- Kestra -->
+  <rect x="110" y="415" width="200" height="45" rx="5" ry="5" fill="#FFFFFF" stroke="#8E44AD" stroke-width="1" />
+  <text x="210" y="435" font-family="Arial" font-size="12" text-anchor="middle">Kestra</text>
+  <text x="210" y="450" font-family="Arial" font-size="10" text-anchor="middle">movielens_pipeline.yml</text>
+
+  <!-- Data Services Layer -->
+  <rect x="100" y="520" width="800" height="100" rx="5" ry="5" fill="#FFF9E3" fill-opacity="0.8" stroke="#F1C40F" stroke-width="2" />
+  <text x="500" y="535" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold" fill="#9A7D0A">Data Services Layer (Lakehouse Consumers)</text>
+
+  <!-- Transformation Layer -->
+  <rect x="110" y="545" width="240" height="65" rx="5" ry="5" fill="#FADBD8" fill-opacity="0.8" stroke="#E74C3C" stroke-width="1" />
+  <text x="230" y="565" font-family="Arial" font-size="12" text-anchor="middle" font-weight="bold" fill="#943126">SQL Analytics (dbt)</text>
+  <text x="230" y="585" font-family="Arial" font-size="10" text-anchor="middle">silver_movie_ratings.sql</text>
+  <text x="230" y="600" font-family="Arial" font-size="10" text-anchor="middle">gold_movie_analytics.sql</text>
+
+  <!-- ETL Processing -->
+  <rect x="370" y="545" width="240" height="65" rx="5" ry="5" fill="#D6EAF8" fill-opacity="0.8" stroke="#3498DB" stroke-width="1" />
+  <text x="490" y="565" font-family="Arial" font-size="12" text-anchor="middle" font-weight="bold" fill="#1A5276">Data Analytics</text>
+  <text x="490" y="585" font-family="Arial" font-size="10" text-anchor="middle">query_data.py</text>
+  <text x="490" y="600" font-family="Arial" font-size="10" text-anchor="middle">Data extraction for visualizations</text>
+
+  <!-- Visualization -->
+  <rect x="630" y="545" width="240" height="65" rx="5" ry="5" fill="#AED6F1" fill-opacity="0.8" stroke="#3498DB" stroke-width="1" />
+  <text x="750" y="565" font-family="Arial" font-size="12" text-anchor="middle" font-weight="bold" fill="#1B4F72">Visualization</text>
+  <text x="750" y="585" font-family="Arial" font-size="10" text-anchor="middle">Metabase</text>
+  <text x="750" y="600" font-family="Arial" font-size="10" text-anchor="middle">generate_dashboard.py (Chart.js)</text>
+
+  <!-- S3 Bucket -->
+  <rect x="80" y="630" width="840" height="50" rx="5" ry="5" fill="#FFFFFF" stroke="#232F3E" stroke-width="2" />
+  <text x="500" y="655" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">S3 Bucket: movielens-dev-datalake (Storage Layer)</text>
+  <text x="500" y="675" font-family="Arial" font-size="10" text-anchor="middle">Provisioned by Terraform (main.tf, variables.tf, outputs.tf)</text>
+
+  <!-- Data Flow Arrows -->
+  <!-- Ingestion to Processing -->
+  <line x1="320" y1="330" x2="340" y2="330" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Storage and S3 -->
+  <line x1="500" y1="605" x2="500" y2="625" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Orchestration manages all -->
+  <line x1="210" y1="395" x2="210" y2="375" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="320" y1="425" x2="340" y2="425" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" />
+
+  <!-- Data services pulling from Gold -->
+
+
+  <!-- Arrow Definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+</svg>
